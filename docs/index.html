@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Method 3D Reconstruction Benchmark</title>
+<meta name="description" content="A comparative study of sparse and dense 3D reconstruction pipelines — COLMAP SfM, SP+SG, DISK, LoFTR, LightGlue, GLOMAP, MASt3R and VGGT — evaluated with hloc.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="#top" class="nav-brand">recon<span>.bench</span></a>
+  <div class="nav-links">
+    <a href="#abstract">Abstract</a>
+    <a href="#method">Method</a>
+    <a href="#comparison">Comparison</a>
+    <a href="#status">Status</a>
+    <a href="#future">Future</a>
+  </div>
+  <button id="theme-toggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">◐</span>
+  </button>
+</nav>
+
+<header class="hero" id="top">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <span class="status-pill"><span class="pulse-dot"></span>Active research — in progress</span>
+    <h1>Multi-Method 3D Reconstruction Benchmark</h1>
+    <p class="hero-sub">
+      Comparing classical and feed-forward reconstruction pipelines — SP+SG, LoFTR, DISK,
+      LightGlue, MASt3R and VGGT — across sparse and dense stages,
+      with point clouds registered and evaluated through hloc .
+    </p>
+    <div class="hero-meta">
+      <span>Research internship · IIT Roorkee</span>
+    </div>
+    <div class="hero-links">
+      <a href="https://github.com/sinxcosx07/3D-reconstruction" class="btn btn-primary" target="_blank" rel="noopener">Code ↗</a>
+      <a href="#comparison" class="btn btn-ghost">View reconstructions</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section id="abstract" class="section">
+    <span class="eyebrow">00 — abstract</span>
+    <h2>Abstract</h2>
+    <p class="section-lead">
+     This blog documents the implementation and evaluation of multiple 3D reconstruction pipelines, including feature-based SfM methods, dense reconstruction techniques, and transformer-based feed-forward models.
+     Rather than benchmarking numerical metrics alone, the focus is on visually comparing the resulting sparse and dense point clouds while explaining the architecture and processing stages of each pipeline. 
+     The final section highlights the bottlenecks encountered during development and outlines future work as the research continues.
+    </p>
+  </section>
+
+  <section id="method" class="section">
+    <span class="eyebrow">01 — method</span>
+    <h2>Method &amp; pipeline</h2>
+    <p class="section-lead">
+      Every method in this study is evaluated along the same pipeline, from raw capture to a
+      registered point cloud.
+    </p>
+     <figure class="pipeline-figure">
+      <picture>
+        <source srcset="assets/pipeline/pipeline-diagram.webp" type="image/webp">
+        <img src="assets/pipeline/pipeline-diagram.jpg"
+             alt="Four-stage 3D reconstruction pipeline: image/video input, sparse reconstruction (SfM) with feature detection, matching, pose and bundle adjustment; dense reconstruction with PatchMatch stereo, depth maps and surface reconstruction; and evaluation/visualization producing meshes and final deliverables."
+             loading="lazy">
+      </picture>
+      <figcaption>Video/images → sparse reconstruction (SfM) → dense reconstruction → evaluation &amp; visualization</figcaption>
+    </figure>
+  
+
+    <div class="methods-groups">
+      <div class="methods-group">
+        <h4>Classical / correspondence-based</h4>
+        <ul class="methods-list">
+          <li>Aliked</li>
+          <li>SuperPoint + SuperGlue</li>
+          <li>DISK</li>
+          <li>LoFTR</li>
+          <li>LightGlue</li>
+          <li>GLOMAP</li>
+        </ul>
+      </div>
+      <div class="methods-group">
+        <h4>Feed-forward / transformer-based</h4>
+        <ul class="methods-list">
+          <li>MASt3R</li>
+          <li>VGGT</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="comparison" class="section">
+    <span class="eyebrow">02 — comparison</span>
+    <h2>Comparison &amp; visualization</h2>
+    <p class="section-lead">
+      Each cell below is one method's reconstruction of one dataset. Click any thumbnail —
+      or a method card below the viewer — to load that point cloud into the interactive
+      viewer for a closer look.
+    </p>
+
+    <div class="grid-scroll">
+      <div id="comparison-grid" class="comparison-grid"></div>
+    </div>
+
+    <div class="viewer-block">
+      <div class="viewer-header">
+        <div id="dataset-tabs" class="dataset-tabs"></div>
+      </div>
+      <div id="viewer-canvas-container" class="viewer-canvas-container">
+        <div id="viewer-overlay" class="viewer-overlay">Loading point cloud…</div>
+      </div>
+      <div id="method-cards" class="method-cards"></div>
+    </div>
+  </section>
+
+  <section id="status" class="section">
+    <span class="eyebrow">03 — status</span>
+    <h2>Status &amp; bottlenecks</h2>
+    <p class="section-lead">
+      This project is actively being worked on. Logged here in the order they came up —
+      edit freely as your work progresses.
+    </p>
+    <ul class="status-log">
+      <li class="status-item status-done">
+        <span class="status-dot"></span>
+        <span class="status-tag">done</span>
+        <span class="status-text">Sparse and dense reconstruction pipelines integrated — COLMAP, VGGT, hloc</span>
+      </li>
+      <li class="status-item status-blocked">
+        <span class="status-dot"></span>
+        <span class="status-tag">blocked</span>
+        <span class="status-text">VGGT and Mast3r and other large reconstruction based models consume huge gpu space and run into OOM erros frequently.
+          Dense reconstruction is required time and again for the classical COLMAP / correspondence based algorithms.This consumes huge gpu space and time.</span>
+      </li>
+      <li class="status-item status-progress">
+        <span class="status-dot"></span>
+        <span class="status-tag">in progress</span>
+        <span class="status-text"><p>Currently working on a new pipeline that does end-to-end 3D Gaussian reconstruction from a video / images.</p>
+                  The best and compatiable pipeline identified for the same is : Video/images --> Mast3r --> Dense Reconstruction --> 3D Gaussians
+        </span>
+      </li>
+      <li class="status-item status-planned">
+        <span class="status-dot"></span>
+        <span class="status-tag">planned</span>
+        <span class="status-text">Mesh fusion and cleanup pass on registered point clouds</span>
+      </li>
+    </ul>
+  </section>
+
+  <section id="future" class="section">
+    <span class="eyebrow">04 — future work</span>
+    <h2>Future work and Scope</h2>
+    <div class="future-cards">
+      <div class="future-card">
+        <h3>Digital twin reconstruction</h3>
+        <p>Extending the pipeline toward full digital-twin-grade reconstructions of real
+        environments — combining the strongest sparse and dense stages found in this
+        comparison.</p>
+      </div>
+      <div class="future-card">
+        <h3>Future Directions</h3>
+        <p>Such models have broad applications in robotic navigation and autonomous systems, industrial inspection and structural analysis,and AR/VR-based visualization and simulation.</p>
+      </div>
+    </div>
+  </section>
+  <section id="acknowledgements" class="section">
+  <span class="eyebrow">05 — acknowledgements</span>
+  <h2>Acknowledgements</h2>
+  <p class="section-lead">
+    This work was carried out as part of a research internship at IIT Roorkee, 
+    building on several open-source reconstruction pipelines and under the guidance of Hrishikesh Sir and Aarti Ma'am.
+  </p>
+    <div class="methods-group">
+      <h4>Methods &amp; tools</h4>
+      <ul class="methods-list">
+        <li><a href="https://github.com/magicleap/SuperGluePretrainedNetwork" target="_blank" rel="noopener">SuperPoint + SuperGlue</a></li>
+        <li><a href="https://github.com/cvlab-epfl/disk" target="_blank" rel="noopener">DISK</a></li>
+        <li><a href="https://github.com/zju3dv/LoFTR" target="_blank" rel="noopener">LoFTR</a></li>
+        <li><a href="https://github.com/cvg/LightGlue" target="_blank" rel="noopener">LightGlue</a></li>
+        <li><a href="https://github.com/colmap/glomap" target="_blank" rel="noopener">GLOMAP</a></li>
+        <li><a href="https://github.com/naver/mast3r" target="_blank" rel="noopener">MASt3R</a></li>
+        <li><a href="https://github.com/facebookresearch/vggt" target="_blank" rel="noopener">VGGT</a></li>
+        <li><a href="https://github.com/cvg/Hierarchical-Localization" target="_blank" rel="noopener">hloc</a></li>
+        <li><a href="https://github.com/colmap/colmap" target="_blank" rel="noopener">COLMAP</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <p>Research internship, IIT Roorkee · <a href="https://github.com/sinxcosx07/3D-reconstruction" target="_blank" rel="noopener">GitHub</a></p>
+  <p class="footer-note">Last updated — 26-July-2026.</p>
+</footer>
+
+<script src="js/hero-canvas.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/viewer.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
